@@ -1,0 +1,18 @@
+<lint-module
+    format="1"
+    dir="/Users/akashsingh/Documents/backup/flutter_projects/task_app/android/app"
+    name=":app"
+    type="APP"
+    maven="android:app:"
+    gradle="7.3.0"
+    buildFolder="/Users/akashsingh/Documents/backup/flutter_projects/task_app/build/app"
+    bootClassPath="/Users/akashsingh/Library/Android/sdk/platforms/android-33/android.jar:/Users/akashsingh/Library/Android/sdk/build-tools/30.0.3/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-33">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>
