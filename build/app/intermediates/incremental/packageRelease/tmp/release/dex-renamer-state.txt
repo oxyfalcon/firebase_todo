@@ -1,4 +1,0 @@
-#Wed Jul 19 15:41:22 IST 2023
-base.0=/Users/akashsingh/Documents/backup/flutter_projects/task_app/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
