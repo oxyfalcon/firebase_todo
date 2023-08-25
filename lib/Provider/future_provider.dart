@@ -22,7 +22,6 @@ class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
 
   @override
   Future<List<Todo>> build() {
-    print("Provider: build");
     return _fetchTodo();
   }
 
