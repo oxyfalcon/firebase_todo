@@ -1,3 +1,4 @@
+import 'package:app/screens/done_list_screen/marked_home_page.dart';
 import 'package:flutter/material.dart';
 
 class DoneListButton extends StatelessWidget {
@@ -10,7 +11,8 @@ class DoneListButton extends StatelessWidget {
     return ElevatedButton.icon(
       label: const Text("Done"),
       onPressed: () {
-        Navigator.pushNamed(context, '/marked');
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const MarkedHomePage()));
       },
       icon: const Icon(Icons.check),
     );
