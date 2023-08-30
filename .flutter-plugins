@@ -1,7 +1,0 @@
-# This is a generated file; do not edit or check into version control.
-cloud_firestore=/Users/akashsingh/.pub-cache/hosted/pub.dev/cloud_firestore-4.9.0/
-cloud_firestore_web=/Users/akashsingh/.pub-cache/hosted/pub.dev/cloud_firestore_web-3.7.0/
-firebase_core=/Users/akashsingh/.pub-cache/hosted/pub.dev/firebase_core-2.15.1/
-firebase_core_web=/Users/akashsingh/.pub-cache/hosted/pub.dev/firebase_core_web-2.7.0/
-firebase_database=/Users/akashsingh/.pub-cache/hosted/pub.dev/firebase_database-10.2.5/
-firebase_database_web=/Users/akashsingh/.pub-cache/hosted/pub.dev/firebase_database_web-0.2.3+5/
