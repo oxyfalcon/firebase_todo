@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:app/Provider/notify_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
+  var db = FirebaseFirestore.instance;
   String uri = "https://api.nstack.in/v1/todos";
   var header = {'Content-Type': 'application/json'};
   Future<List<Todo>> _fetchTodo() async {
@@ -23,11 +25,17 @@ class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
   @override
   Future<List<Todo>> build() {
     print("Provider: build");
+    print(db);
     return _fetchTodo();
   }
 
   void addTodo(Todo t) async {
     state = const AsyncValue.loading();
+    var body = {
+      "title": t.todo,
+      "description": t.description,
+      "is_completed": t.completed
+    };
     state = await AsyncValue.guard(() async {
       await http.post(Uri.parse("https://api.nstack.in/v1/todos"),
           headers: header,
@@ -38,6 +46,7 @@ class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
           }));
       return _fetchTodo();
     });
+    db.collection('users').add(body).then((value) => print(value));
   }
 
   Future<void> deleteTodo(Todo t) async {

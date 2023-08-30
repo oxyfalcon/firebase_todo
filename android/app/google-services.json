@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "589767727505",
+    "project_id": "todo-list-ec223",
+    "storage_bucket": "todo-list-ec223.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589767727505:android:42cda83ff37447dddd6230",
+        "android_client_info": {
+          "package_name": "com.example.task_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "589767727505-hl6l6afbga2j4s0tfs76knds9259r061.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAY_-9r5pHnA3VpXJFnr__Yqd4BoSzto2M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "589767727505-hl6l6afbga2j4s0tfs76knds9259r061.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "589767727505-1k372aek9b29tb9iskql4nk5vjg2tn69.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.taskApp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

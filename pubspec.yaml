@@ -43,6 +43,9 @@ dependencies:
   freezed: ^2.3.5
   expansion_tile_card: ^3.0.0
   http: ^1.1.0
+  firebase_database: ^10.2.5
+  cloud_firestore: ^4.9.0
+  firebase_core: ^2.15.1
 
 
 dev_dependencies:
