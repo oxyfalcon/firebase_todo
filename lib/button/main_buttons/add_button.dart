@@ -20,7 +20,7 @@ class _AddButtonState extends ConsumerState<AddButton> {
           openDialog(
               context: context,
               ref: ref,
-              todo: Todo(todo: "", description: "", id: ""),
+              todo: Todo(todo: "", description: "", id: "", isCompleted: false),
               edit: false);
         }));
   }

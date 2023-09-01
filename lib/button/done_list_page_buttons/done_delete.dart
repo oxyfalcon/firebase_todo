@@ -17,7 +17,7 @@ class DoneDeleteButton extends StatelessWidget {
     return IconButton.filled(
       color: Theme.of(context).cardColor,
       onPressed: () {
-        todoState.markedDelete(itr);
+        todoState.markedChange(itr: itr, change: false);
       },
       icon: const Icon(Icons.delete),
     );

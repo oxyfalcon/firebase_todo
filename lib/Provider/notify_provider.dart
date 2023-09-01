@@ -10,12 +10,20 @@ class Todo {
   String todo;
   String description;
   String id;
-  bool completed = false;
+  bool isCompleted;
 
-  Todo({required this.todo, required this.description, required this.id});
+  Todo(
+      {required this.todo,
+      required this.description,
+      required this.id,
+      required this.isCompleted});
 
   factory Todo.fromJson(Map<String, dynamic> m) {
-    return Todo(todo: m['title'], description: m['description'], id: m['_id']);
+    return Todo(
+        todo: m['title'],
+        description: m['description'],
+        id: m['_id'],
+        isCompleted: m['is_completed']);
   }
 }
 
@@ -28,7 +36,7 @@ class PageDecider extends Notifier<Widget> {
         if (watchingList.isEmpty) {
           return const NoToDoList();
         } else {
-          return const ShowingTodo();
+          return const Tiles();
         }
       },
       error: (error, stackTrace) => Text(error.toString()),
@@ -46,19 +54,19 @@ class MarkedPageDecider extends Notifier<Widget> {
     final watchingList = ref.watch(futureTodoListProvider);
     return watchingList.when(
       data: (list) {
-        bool flag = true;
-        for (var itr in list) {
-          if (itr.completed == true) {
-            flag = false;
-            break;
-          }
-        }
+        bool flag = list.any((element) => (element.isCompleted == true));
         Widget temp;
-        (flag) ? temp = const MarkedNoTodoList() : temp = const MarkedTiles();
+        if (flag) {
+          List<Todo> completedList = List.from(list.where(
+              (element) => (element.isCompleted == true) ? true : false));
+          temp = MarkedTiles(completedList: completedList);
+        } else {
+          temp = const MarkedNoTodoList();
+        }
         return temp;
       },
       error: (error, stackTrace) => Text(error.toString()),
-      loading: () => const CircularProgressIndicator.adaptive(),
+      loading: () => const Center(child: CircularProgressIndicator.adaptive()),
     );
   }
 }

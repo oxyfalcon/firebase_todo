@@ -1,115 +1,70 @@
-import 'dart:convert';
 import 'package:app/Provider/notify_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 
 class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
   var db = FirebaseFirestore.instance;
-  String uri = "https://api.nstack.in/v1/todos";
-  var header = {'Content-Type': 'application/json'};
-  Future<List<Todo>> _fetchTodo() async {
-    final response = await http.get(Uri.parse(uri));
-    var json = jsonDecode(response.body)['items'];
+  void name() {
+    db.settings = const Settings(persistenceEnabled: true);
+  }
+
+  Future<List<Todo>> _fetchTodoFirebase() async {
+    var x = await db.collection('users').get();
     List<Todo> list = [];
-    for (var itr in json) {
-      list.add(Todo.fromJson(itr));
-    }
+    x.docs.map((e) => list.add(Todo.fromJson(e.data()))).toList();
     return list;
   }
 
-  Future<void> fetch() async {
-    state = await AsyncValue.guard(() => _fetchTodo());
-  }
+  Future<void> fetch() async =>
+      state = await AsyncValue.guard(() => _fetchTodoFirebase());
 
   @override
-  Future<List<Todo>> build() {
-    print("Provider: build");
-    print(db);
-    return _fetchTodo();
-  }
+  Future<List<Todo>> build() => _fetchTodoFirebase();
 
   void addTodo(Todo t) async {
     state = const AsyncValue.loading();
-    var body = {
-      "title": t.todo,
-      "description": t.description,
-      "is_completed": t.completed
-    };
     state = await AsyncValue.guard(() async {
-      await http.post(Uri.parse("https://api.nstack.in/v1/todos"),
-          headers: header,
-          body: jsonEncode({
-            "title": t.todo,
-            "description": t.description,
-            "is_completed": t.completed
-          }));
-      return _fetchTodo();
+      var id = db.collection('users').doc().id;
+      var body = {
+        "title": t.todo,
+        "description": t.description,
+        "is_completed": t.isCompleted,
+        "_id": id
+      };
+      t.id = id;
+      db.collection('users').doc(t.id).set(body);
+      return _fetchTodoFirebase();
     });
-    db.collection('users').add(body).then((value) => print(value));
   }
 
   Future<void> deleteTodo(Todo t) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       String id = t.id;
-      http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"),
-          headers: header);
-      return _fetchTodo();
+      db.collection('users').doc(id).delete();
+      return _fetchTodoFirebase();
     });
   }
 
   Future<void> editTodo(Todo edited) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      http.put(Uri.parse("https://api.nstack.in/v1/todos/${edited.id}"),
-          headers: header,
-          body: jsonEncode({
-            "title": edited.todo,
-            "description": edited.description,
-            "is_completed": edited.completed
-          }));
-      return _fetchTodo();
+      Map<String, dynamic> body = {
+        "title": edited.todo,
+        "description": edited.description,
+        "is_completed": edited.isCompleted,
+        "_id": edited.id
+      };
+      db.collection('users').doc(edited.id).set(body);
+      return _fetchTodoFirebase();
     });
   }
 
-  Future<void> markedAdd(Todo edited) async {
+  Future<void> markedChange({required Todo itr, required bool change}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      http.put(Uri.parse("https://api.nstack.in/v1/todos/${edited.id}"),
-          headers: header,
-          body: jsonEncode({
-            "title": edited.todo,
-            "description": edited.description,
-            "is_completed": true
-          }));
-      return _fetchTodo();
-    });
-  }
-
-  Future<void> markedDelete(Todo edited) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      http.put(Uri.parse("https://api.nstack.in/v1/todos/${edited.id}"),
-          headers: header,
-          body: jsonEncode({
-            "title": edited.todo,
-            "description": edited.description,
-            "is_completed": false
-          }));
-      return _fetchTodo();
-    });
-  }
-
-  Future<void> changeById(Todo t, bool value) async {
-    state = await AsyncValue.guard(() {
-      http.post(Uri.parse("https://api.nstack.in/v1/todos/${t.id}"),
-          body: jsonEncode({
-            "title": t.todo,
-            "description": t.description,
-            "is_completed": value
-          }));
-      return _fetchTodo();
+      await db.collection("users").doc(itr.id).update({'is_completed': change});
+      return _fetchTodoFirebase();
     });
   }
 }

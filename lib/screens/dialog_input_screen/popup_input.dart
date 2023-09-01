@@ -28,7 +28,7 @@ Future<dynamic> dialog(
   return todos.when(
     data: (todoList) => showDialog(
       context: context,
-      builder: (context) => AlertDialog.adaptive(
+      builder: (context) => AlertDialog(
         title: const Text("Enter Todo"),
         content: Column(
           children: [
