@@ -1,5 +1,5 @@
+import 'package:app/auth_date.dart';
 import 'package:app/firebase_options.dart';
-import 'package:app/my_home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return Material(
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: const MyHomePage(),
+          home: const AuthGate(),
           title: "Todo",
           theme: ThemeData(
             colorScheme:
