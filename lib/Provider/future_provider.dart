@@ -1,15 +1,14 @@
 import 'package:app/Provider/notify_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
   var db = FirebaseFirestore.instance;
-  void name() {
-    db.settings = const Settings(persistenceEnabled: true);
-  }
+  User? user = FirebaseAuth.instance.currentUser;
 
   Future<List<Todo>> _fetchTodoFirebase() async {
-    var x = await db.collection('users').get();
+    var x = await db.collection("users").get();
     List<Todo> list = [];
     x.docs.map((e) => list.add(Todo.fromJson(e.data()))).toList();
     return list;
@@ -19,7 +18,10 @@ class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
       state = await AsyncValue.guard(() => _fetchTodoFirebase());
 
   @override
-  Future<List<Todo>> build() => _fetchTodoFirebase();
+  Future<List<Todo>> build() {
+    db.settings = const Settings(persistenceEnabled: true);
+    return _fetchTodoFirebase();
+  }
 
   void addTodo(Todo t) async {
     state = const AsyncValue.loading();

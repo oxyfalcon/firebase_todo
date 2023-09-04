@@ -1,4 +1,5 @@
 import 'package:app/Provider/notify_provider.dart';
+import 'package:app/profile.dart';
 import 'package:app/screens/todo_list_screen/todo_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,11 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [IconButton(onPressed: () =>
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) =>
+                const ProfilePage())),
+            icon: const Icon(Icons.settings))],
           bottom: TabBar(
               indicatorSize: TabBarIndicatorSize.tab,
               labelColor: Colors.white,
