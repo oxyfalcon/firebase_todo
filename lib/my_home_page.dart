@@ -1,8 +1,9 @@
 import 'package:app/Provider/notify_provider.dart';
 import 'package:app/profile.dart';
-import 'package:app/screens/todo_list_screen/todo_list_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfire_ui/auth.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -43,11 +44,16 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [IconButton(onPressed: () =>
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>
-                const ProfilePage())),
-            icon: const Icon(Icons.settings))],
+          actions: [
+            StreamBuilder(
+                stream: FirebaseAuth.instance.userChanges(),
+                builder: (context, snapshot) =>
+                    Text(snapshot.data?.displayName ?? "")),
+            InkWell(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const ProfilePage())),
+                child: const UserAvatar(size: 30)),
+          ],
           bottom: TabBar(
               indicatorSize: TabBarIndicatorSize.tab,
               labelColor: Colors.white,
@@ -76,8 +82,8 @@ class _MyHomePageState extends State<MyHomePage>
           centerTitle: true,
           backgroundColor: Theme.of(context).colorScheme.inversePrimary),
       body: TabBarView(controller: _tabController, children: [
-        const Tiles(),
-        Consumer(builder: (_, ref, __) => ref.watch(markedPageDeciderProvider))
+        Consumer(builder: (_, ref, __) => ref.watch(pageDeciderProvider)),
+        Consumer(builder: (_, ref, __) => ref.watch(markedPageDeciderProvider)),
       ]),
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
     );
@@ -116,14 +122,14 @@ class CustomTabs extends StatelessWidget {
               Theme.of(context).colorScheme.primary,
               Theme.of(context).colorScheme.inversePrimary);
 
-          return Tab(
-              child: LayoutBuilder(
-                  builder: (context, constraints) => Container(
-                        width: constraints.maxWidth,
-                        height: constraints.maxHeight,
-                        color: color,
-                        child: icon,
-                      )));
+          return Tab(child: LayoutBuilder(builder: (context, constraints) {
+            return Container(
+              width: constraints.biggest.width,
+              height: constraints.maxHeight,
+              color: color,
+              child: icon,
+            );
+          }));
         });
   }
 

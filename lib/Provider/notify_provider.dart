@@ -27,49 +27,66 @@ class Todo {
   }
 }
 
-class PageDecider extends Notifier<Widget> {
+class PageDecider extends AutoDisposeNotifier<Widget> {
   @override
-  Widget build() {
+  Widget build() => buildHelper();
+
+  Widget buildHelper() {
     final watchingList = ref.watch(futureTodoListProvider);
+    final futureTodoListNotifier = ref.read(futureTodoListProvider.notifier);
     return watchingList.when(
       data: (watchingList) {
         if (watchingList.isEmpty) {
           return const NoToDoList();
         } else {
-          return const Tiles();
+          return TileDisplay(
+            futureState: futureTodoListNotifier,
+            list: watchingList,
+          );
         }
       },
-      error: (error, stackTrace) => Text(error.toString()),
-      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) {
+        return Text(error.toString());
+      },
+      loading: () {
+        return const Center(
+            child: CircularProgressIndicator(color: Colors.red));
+      },
     );
   }
 }
 
 final pageDeciderProvider =
-    NotifierProvider<PageDecider, Widget>(() => PageDecider());
+    AutoDisposeNotifierProvider<PageDecider, Widget>(() => PageDecider());
 
-class MarkedPageDecider extends Notifier<Widget> {
-  @override
-  Widget build() {
+class MarkedPageDecider extends AutoDisposeNotifier<Widget> {
+  Widget _buildHelper() {
     final watchingList = ref.watch(futureTodoListProvider);
     return watchingList.when(
       data: (list) {
         bool flag = list.any((element) => (element.isCompleted == true));
-        Widget temp;
         if (flag) {
           List<Todo> completedList = List.from(list.where(
               (element) => (element.isCompleted == true) ? true : false));
-          temp = MarkedTiles(completedList: completedList);
+          return MarkedTiles(completedList: completedList);
         } else {
-          temp = const MarkedNoTodoList();
+          return const MarkedNoTodoList();
         }
-        return temp;
       },
       error: (error, stackTrace) => Text(error.toString()),
-      loading: () => const Center(child: CircularProgressIndicator.adaptive()),
+      loading: () => const Center(
+          child: CircularProgressIndicator(
+        color: Colors.black,
+      )),
     );
+  }
+
+  @override
+  Widget build() {
+    return _buildHelper();
   }
 }
 
 final markedPageDeciderProvider =
-    NotifierProvider<MarkedPageDecider, Widget>(() => MarkedPageDecider());
+    AutoDisposeNotifierProvider<MarkedPageDecider, Widget>(
+        () => MarkedPageDecider());

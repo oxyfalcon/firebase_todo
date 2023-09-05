@@ -10,27 +10,31 @@ class MarkedTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Consumer(builder: (context, ref, child) {
-        final todoState = ref.watch(futureTodoListProvider.notifier);
-        return RefreshIndicator(
-          onRefresh: () => todoState.fetch(),
-          child: ListView.builder(
-            itemCount: completedList.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: ListTile(
-                    horizontalTitleGap: 10,
-                    subtitle: Text(completedList[index].description),
-                    trailing: DoneDeleteButton(
-                        todoState: todoState, itr: completedList[index]),
-                    title: Text(completedList[index].todo)),
+    return Column(
+      children: [
+        Expanded(
+          child: Consumer(builder: (context, ref, child) {
+            final todoState = ref.watch(futureTodoListProvider.notifier);
+            return RefreshIndicator(
+              onRefresh: () => todoState.fetch(),
+              child: ListView.builder(
+                itemCount: completedList.length,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: ListTile(
+                        horizontalTitleGap: 10,
+                        subtitle: Text(completedList[index].description),
+                        trailing: DoneDeleteButton(
+                            todoState: todoState, itr: completedList[index]),
+                        title: Text(completedList[index].todo)),
+                  ),
+                ),
               ),
-            ),
-          ),
-        );
-      }),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

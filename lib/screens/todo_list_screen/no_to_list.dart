@@ -6,18 +6,25 @@ class NoToDoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.secondaryContainer,
+      backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       body: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          Center(
-            child: FittedBox(
-                child: Text("No Todo", style: theme.textTheme.labelLarge)),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Center(
+                  child: FittedBox(
+                      child: Text("No Todo",
+                          style: Theme.of(context).textTheme.labelLarge)),
+                ),
+              ),
+            ],
           ),
           const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.0),
-              child: AddButton()),
+              padding: EdgeInsets.symmetric(vertical: 20.0), child: AddButton())
         ],
       ),
     );

@@ -44,6 +44,8 @@ dependencies:
   firebase_core: ^2.15.1
   firebase_auth: ^4.9.0
   flutterfire_ui: ^0.4.3+20
+  file_picker: ^5.5.0
+  firebase_storage: ^11.2.6
 
 
 dev_dependencies:
