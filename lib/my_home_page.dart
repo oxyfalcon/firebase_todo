@@ -1,9 +1,9 @@
+import 'package:app/Provider/future_provider.dart';
 import 'package:app/Provider/notify_provider.dart';
 import 'package:app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfire_ui/auth.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -48,13 +48,24 @@ class _MyHomePageState extends State<MyHomePage>
             StreamBuilder(
                 stream: FirebaseAuth.instance.userChanges(),
                 builder: (context, snapshot) =>
-                    Text(snapshot.data?.displayName ?? "")),
+                    Text(snapshot.data?.displayName ?? "Hello")),
             InkWell(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const ProfilePage())),
-                child: const UserAvatar(size: 30)),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfilePage())),
+                child:  Consumer(
+                  builder: (context, ref, child) {
+                    var profileUrl = ref.watch(profileUrlProvider);
+                    return profileUrl.when(
+                        data: (url) => CustomUserAvatar(url: url),
+                        error: (error, stacktrace) => const Text("Could not do it"),
+                        loading: () => const CircularProgressIndicator());
+                  }
+                )),
           ],
           bottom: TabBar(
+              labelPadding: EdgeInsets.zero,
               indicatorSize: TabBarIndicatorSize.tab,
               labelColor: Colors.white,
               indicator: const UnderlineTabIndicator(),
@@ -124,9 +135,12 @@ class CustomTabs extends StatelessWidget {
 
           return Tab(child: LayoutBuilder(builder: (context, constraints) {
             return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: color,
+              ),
               width: constraints.biggest.width,
               height: constraints.maxHeight,
-              color: color,
               child: icon,
             );
           }));

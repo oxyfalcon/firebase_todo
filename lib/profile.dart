@@ -1,6 +1,9 @@
+import 'package:app/Provider/future_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -18,11 +21,32 @@ class ProfilePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Align(
-            child: UserAvatar(
-              auth: FirebaseAuth.instance,
-            ),
+            child: Consumer(builder: (context, ref, child) {
+              var profileUrl = ref.watch(profileUrlProvider);
+              ProfileNotifier profileNotifier =
+                  ref.watch(profileUrlProvider.notifier);
+              return InkWell(
+                  onTap: () {
+                    profileNotifier.uploadFile();
+                  },
+                  child: profileUrl.when(
+                      data: (url) => CustomUserAvatar(url: url),
+                      error: (error, stacktrace) =>
+                          const Text("Could not do it"),
+                      loading: () => const CircularProgressIndicator()));
+            }),
           ),
           const Align(child: EditableUserDisplayName()),
+          Align(
+            child: Consumer(
+                builder: (context, ref, child) => Container(
+                    margin: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      "${ref.read(userProvider).value!.email}",
+                      style: const TextStyle(fontSize: 20),
+                    ))),
+          ),
           Container(
             margin: const EdgeInsets.all(10),
             child: FilledButton(
@@ -52,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                 },
                 style: ButtonStyle(backgroundColor: CustomRedColor()),
                 child: const Text("Delete Account")),
-          )
+          ),
         ],
       ),
     );
@@ -64,25 +88,37 @@ class CustomRedColor extends MaterialStateProperty<Color> {
   Color resolve(Set<MaterialState> states) => Colors.red;
 }
 
-// class ProfilePicture extends StatefulWidget {
-//   const ProfilePicture({super.key});
-//
-//   @override
-//   State<ProfilePicture> createState() => _ProfilePictureState();
-// }
-//
-// class _ProfilePictureState extends State<ProfilePicture> {
-//   final storageRef = FirebaseStorage.instance.ref();
-//   Future<void> _getFile() async{
-//     final result = await FilePicker.platform.pickFiles();
-//     final path = File()
-//   }
-//
-//   Future<void> _uploadFile() async{
-//
-//   }
-//   @override
-//   Widget build(BuildContext context) {
-//     return ;
-//   }
-// }
+class CustomUserAvatar extends ConsumerWidget {
+  const CustomUserAvatar({super.key, required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    double size = 100;
+    return SizedBox(
+      height: size,
+      width: size,
+      child: ClipPath(
+        clipper: const ShapeBorderClipper(shape: CircleBorder()),
+        clipBehavior: Clip.hardEdge,
+        child: url != ""
+            ? Image.network(
+                url,
+                width: size,
+                height: size,
+                cacheWidth: size.toInt(),
+                cacheHeight: size.toInt(),
+                fit: BoxFit.cover,
+              )
+            : Center(
+                child: Icon(
+                  Icons.account_circle,
+                  size: size,
+                  color: Colors.grey,
+                ),
+              ),
+      ),
+    );
+  }
+}

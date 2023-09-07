@@ -22,42 +22,46 @@ class TileDisplay extends StatelessWidget {
         Expanded(
           child: RefreshIndicator(
             onRefresh: futureState.fetch,
-            child: ListView.builder(
-                itemCount: list.length, itemBuilder: (context, itr) =>
-                Padding(
-                    padding: const EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.only(top:10.0),
+              child: ListView.builder(
+                  itemCount: list.length, itemBuilder: (context, itr) =>
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Card(
-                      child: CheckboxListTile.adaptive(
-                          controlAffinity:
-                          ListTileControlAffinity.leading,
-                          selected: list[itr].isCompleted,
-                          title: Text(list[itr].todo),
-                          subtitle: Text(list[itr].description),
-                          value: list[itr].isCompleted,
-                          secondary: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment:
-                              MainAxisAlignment.end,
-                              children: [
-                                EditButton(itr: list[itr]),
-                                DeleteButton(
-                                    todoState: futureState,
-                                    itr: list[itr]),
-                              ]),
-                          selectedTileColor: Theme
-                              .of(context)
-                              .copyWith(
-                              colorScheme: ColorScheme.fromSeed(
-                                  seedColor: Colors.green))
-                              .colorScheme
-                              .secondaryContainer,
-                          onChanged: (change) {
-                            list[itr].isCompleted = change!;
-                            futureState.markedChange(
-                                itr: list[itr], change: change);
-                          }),
-                    ))
-                ),
+                          child: CheckboxListTile.adaptive(
+                              controlAffinity:
+                              ListTileControlAffinity.leading,
+                              selected: list[itr].isCompleted,
+                              title: Text(list[itr].todo),
+                              subtitle: Text(list[itr].description),
+                              value: list[itr].isCompleted,
+                              secondary: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.end,
+                                  children: [
+                                    EditButton(itr: list[itr]),
+                                    DeleteButton(
+                                        todoState: futureState,
+                                        itr: list[itr]),
+                                  ]),
+                              selectedTileColor: Theme
+                                  .of(context)
+                                  .copyWith(
+                                  colorScheme: ColorScheme.fromSeed(
+                                      seedColor: Colors.green))
+                                  .colorScheme
+                                  .secondaryContainer,
+                              onChanged: (change) {
+                                list[itr].isCompleted = change!;
+                                futureState.markedChange(
+                                    itr: list[itr], change: change);
+                              }),
+                        ),
+                  )
+                  ),
+            ),
           ),
         ),
         const Padding(
