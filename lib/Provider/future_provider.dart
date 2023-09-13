@@ -1,28 +1,30 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app/Provider/notify_provider.dart';
+import 'package:app/Provider/todo_schema.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
-final userProvider =
-    StreamProvider<User?>((ref) => FirebaseAuth.instance.userChanges());
+final userProvider = AutoDisposeStreamProvider<User?>(
+    (ref) => FirebaseAuth.instance.authStateChanges());
 
-class ProfileNotifier extends AsyncNotifier<String> {
-  User? user;
-
+class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
   @override
-  String build() {
-    print("ProfileProvider --------------");
-    user = ref.watch(userProvider).value;
-    String ?temp = user?.photoURL;
+  Future<String> build() async {
+    print("profile builder --------------------");
+    String? temp =
+        await ref.watch(userProvider.selectAsync((data) => data?.photoURL));
     String authPhotoUrl = (temp == null) ? "" : temp;
     return authPhotoUrl;
   }
 
   Future<void> uploadFile() async {
+    User? user = ref.read(userProvider).value;
     ImagePicker pickImage = ImagePicker();
     final result2 = await pickImage.pickImage(source: ImageSource.gallery);
     if (result2 != null) {
@@ -33,7 +35,7 @@ class ProfileNotifier extends AsyncNotifier<String> {
       state = await AsyncValue.guard(() async {
         await storage.putFile(file);
         String storageUrl = await storage.getDownloadURL();
-        user!.updatePhotoURL(storageUrl);
+        user.updatePhotoURL(storageUrl);
         return storageUrl;
       });
     }
@@ -41,17 +43,17 @@ class ProfileNotifier extends AsyncNotifier<String> {
 }
 
 final profileUrlProvider =
-    AsyncNotifierProvider<ProfileNotifier, String>(
+    AutoDisposeAsyncNotifierProvider<ProfileNotifier, String>(
         () => ProfileNotifier());
 
-class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
+class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
   var db = FirebaseFirestore.instance;
   User? user;
 
   @override
-  Future<List<Todo>> build() {
-    print("FutureProvider build ---------------------");
-    user = ref.watch(userProvider).value;
+  Future<List<Todo>> build() async {
+    print("FutureTodo builder --------------------");
+    user = await ref.watch(userProvider.selectAsync((data) => data));
     db.settings = const Settings(persistenceEnabled: true);
     return _fetchTodoFirebase();
   }
@@ -119,5 +121,51 @@ class FutureTodoListNotifier extends AsyncNotifier<List<Todo>> {
 }
 
 final futureTodoListProvider =
-    AsyncNotifierProvider<FutureTodoListNotifier, List<Todo>>(
+    AutoDisposeAsyncNotifierProvider<FutureTodoListNotifier, List<Todo>>(
         () => FutureTodoListNotifier());
+
+class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
+    with WidgetsBindingObserver {
+  // Brightness currentBrightness =
+  //      SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  // late bool isDarkMode;
+
+  // void setMemory(bool value) async {
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   pref.setBool(DarkMode.isDark.name, value);
+  // }
+
+  // Future<bool> getMemory() async {
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   return (pref.containsKey(DarkMode.isDark.name))
+  //       ? false
+  //       : pref.getBool(DarkMode.isDark.name) ??
+  //               (currentBrightness == Brightness.dark)
+  //           ? true
+  //           : false;
+  // }
+
+  @override
+  void didChangePlatformBrightness() {
+    state = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    super.didChangePlatformBrightness();
+  }
+
+  @override
+  Brightness build() {
+    WidgetsBinding.instance.addObserver(this);
+    // isDarkMode = await getMemory();
+    return SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  }
+
+  void changeBrightness(bool value) {
+    state = (value) ? Brightness.dark : Brightness.light;
+    // setMemory(value);
+  }
+}
+
+final brightnessProvider =
+    AutoDisposeNotifierProvider<BrightnessNotifier, Brightness>(
+        () => BrightnessNotifier());
+
+enum DarkMode { isDark, isDefault }

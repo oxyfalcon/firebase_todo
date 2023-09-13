@@ -23,8 +23,12 @@ class NoToDoList extends StatelessWidget {
               ),
             ],
           ),
-          const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.0), child: AddButton())
+          Container(
+            alignment: Alignment.bottomRight,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            margin: const EdgeInsets.all(20.0),
+            child: const AddButton(),
+          )
         ],
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:app/Provider/future_provider.dart';
-import 'package:app/Provider/notify_provider.dart';
+import 'package:app/Provider/todo_schema.dart';
 import 'package:flutter/material.dart';
 
 class DeleteButton extends StatelessWidget {

@@ -1,106 +1,128 @@
 import 'package:app/Provider/future_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:app/Provider/notify_provider.dart';
+import 'package:app/Provider/todo_schema.dart';
 
 Future openDialog(
         {required BuildContext context,
-        required WidgetRef ref,
         required Todo todo,
-        required bool edit}) =>
-    dialog(context: context, todo: todo, edit: edit, ref: ref);
+        required bool edit,
+        required FutureTodoListNotifier futureTodoListNotifier}) =>
+    dialog(
+        context: context,
+        edit: edit,
+        todo: todo,
+        futureTodoListNotifier: futureTodoListNotifier);
 
 Future<dynamic> dialog(
     {required BuildContext context,
     required Todo todo,
     required bool edit,
-    required WidgetRef ref}) {
+    required FutureTodoListNotifier futureTodoListNotifier}) {
   TextEditingController title = TextEditingController();
   TextEditingController description = TextEditingController();
   title.text = todo.todo;
   description.text = todo.description;
   String originalTitle = todo.todo;
-  String origianlDescrition = todo.description;
+  String originalDescription = todo.description;
   Todo newTodo = todo;
 
-  final todos = ref.watch(futureTodoListProvider);
-  final todoState = ref.watch(futureTodoListProvider.notifier);
-  return todos.when(
-    data: (todoList) => showDialog(
+  (String, String) text(BuildContext context) {
+    final TargetPlatform platform = Theme.of(context).platform;
+    (String, String) allCaps = ("CANCEL", "SUBMIT");
+    (String, String) captizedWords = ("Cancel", "Submit");
+
+    switch (platform) {
+      case TargetPlatform.iOS:
+        return allCaps;
+      case TargetPlatform.macOS:
+        return allCaps;
+      default:
+        return captizedWords;
+    }
+  }
+
+  return showAdaptiveDialog(
+      barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Enter Todo"),
-        content: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onChanged: (value) {
-                  newTodo.todo = title.text;
-                },
-                onEditingComplete: () {
-                  newTodo.todo = title.text;
-                },
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: "Enter Todo",
+      builder: (context) {
+        return SingleChildScrollView(
+          child: AlertDialog.adaptive(
+            title: const Text("Enter Todo"),
+            content: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: TextFormField(
+                    autofocus: true,
+                    onChanged: (value) {
+                      newTodo.todo = title.text;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: "Enter Todo",
+                    ),
+                    controller: title,
+                  ),
                 ),
-                controller: title,
-              ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: TextField(
+                    onChanged: (value) {
+                      newTodo.description = description.text;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: "Enter Description",
+                    ),
+                    controller: description,
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onChanged: (value) {
-                  newTodo.description = description.text;
-                },
-                onEditingComplete: () {
-                  newTodo.description = description.text;
-                },
-                decoration: const InputDecoration(
-                  hintText: "Enter Description",
-                ),
-                controller: description,
-              ),
-            )
-          ],
-        ),
-        actions: <Widget>[
-          TextButton.icon(
-              onPressed: () {
-                title.clear();
-                description.clear();
-                todo.todo = originalTitle;
-                todo.description = origianlDescrition;
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.cancel),
-              label: const Text("cancel")),
-          TextButton.icon(
-              onPressed: () {
-                if (title.text != "" && description.text != "") {
-                  if (edit) {
-                    todoState.editTodo(newTodo);
-                  } else {
-                    todoState.addTodo(newTodo);
-                  }
+            actions: [
+              AdaptiveDialog(
+                onPressed: () {
                   title.clear();
                   description.clear();
+                  todo.todo = originalTitle;
+                  todo.description = originalDescription;
                   Navigator.of(context).pop();
-                }
-              },
-              icon: const Icon(Icons.send),
-              label: const Text("Submit"))
-        ],
-      ),
-    ),
-    error: (error, stackTrace) => showDialog(
-      context: context,
-      builder: (context) => Text(error.toString()),
-    ),
-    loading: () => showDialog(
-        context: context,
-        builder: (context) =>
-            const Center(child: CircularProgressIndicator.adaptive())),
-  );
+                },
+                child: Text(text(context).$1),
+              ),
+              AdaptiveDialog(
+                  onPressed: () {
+                    if (title.text != "" && description.text != "") {
+                      (edit)
+                          ? futureTodoListNotifier.editTodo(newTodo)
+                          : futureTodoListNotifier.addTodo(newTodo);
+
+                      title.clear();
+                      description.clear();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text(text(context).$2)),
+            ],
+          ),
+        );
+      });
+}
+
+class AdaptiveDialog extends StatelessWidget {
+  const AdaptiveDialog(
+      {super.key, required this.onPressed, required this.child});
+
+  final Widget child;
+  final void Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final TargetPlatform platform = Theme.of(context).platform;
+    switch (platform) {
+      case TargetPlatform.iOS:
+        return CupertinoDialogAction(onPressed: onPressed, child: child);
+      default:
+        return TextButton(onPressed: onPressed, child: child);
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import 'package:app/Provider/future_provider.dart';
-import 'package:app/Provider/notify_provider.dart';
+import 'package:app/Provider/todo_schema.dart';
 import 'package:app/button/done_list_page_buttons/done_delete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,27 +1,23 @@
-import 'package:app/Provider/notify_provider.dart';
+import 'package:app/Provider/future_provider.dart';
+import 'package:app/Provider/todo_schema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app/screens/dialog_input_screen/popup_input.dart';
 
-class AddButton extends ConsumerStatefulWidget {
+class AddButton extends ConsumerWidget {
   const AddButton({super.key});
-
   @override
-  ConsumerState<AddButton> createState() => _AddButtonState();
-}
-
-class _AddButtonState extends ConsumerState<AddButton> {
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-        label: const Text("add"),
-        icon: const Icon(Icons.favorite),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         onPressed: (() {
           openDialog(
               context: context,
-              ref: ref,
-              todo: Todo(todo: "", description: "", id: "", isCompleted: false),
+              futureTodoListNotifier: ref.read(futureTodoListProvider.notifier),
+              todo: Todo.empty(),
               edit: false);
-        }));
+        }),
+      child: const Icon(Icons.add),
+    );
   }
 }

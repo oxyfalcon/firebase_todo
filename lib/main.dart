@@ -1,6 +1,5 @@
-import 'package:app/my_home_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterfire_ui/auth.dart';
+import 'package:app/Provider/future_provider.dart';
+import 'package:app/auth_gate.dart';
 import 'package:app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,39 +13,23 @@ Future<void> main() async {
   return runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Material(
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: const AuthGate(),
-          title: "Todo",
-          theme: ThemeData(
-            colorScheme:
-                ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
-            useMaterial3: true,
-          )),
+        debugShowCheckedModeBanner: false,
+        home: const AuthGate(),
+        title: "Todo",
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepOrange,
+            brightness: ref.watch(brightnessProvider),
+          ),
+        ),
+      ),
     );
-  }
-}
-
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const SignInScreen(
-              providerConfigs: [EmailProviderConfiguration()],
-            );
-          }
-          return const MyHomePage();
-        });
   }
 }

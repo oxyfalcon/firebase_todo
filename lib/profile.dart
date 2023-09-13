@@ -5,11 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var profileUrl = ref.watch(profileUrlProvider);
+    ProfileNotifier profileNotifier = ref.read(profileUrlProvider.notifier);
+    Brightness currentBrightness = ref.read(brightnessProvider);
+    bool currentValue = (currentBrightness == Brightness.dark) ? true : false;
+    BrightnessNotifier brightnessNotifier =
+        ref.read(brightnessProvider.notifier);
+    String text = (currentValue) ? "light mode" : "dark mode";
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       appBar: AppBar(
@@ -17,65 +24,77 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: ListView(
         children: [
-          Align(
-            child: Consumer(builder: (context, ref, child) {
-              var profileUrl = ref.watch(profileUrlProvider);
-              ProfileNotifier profileNotifier =
-                  ref.watch(profileUrlProvider.notifier);
-              return InkWell(
-                  onTap: () {
-                    profileNotifier.uploadFile();
-                  },
-                  child: profileUrl.when(
-                      data: (url) => CustomUserAvatar(url: url),
-                      error: (error, stacktrace) =>
-                          const Text("Could not do it"),
-                      loading: () => const CircularProgressIndicator()));
-            }),
-          ),
-          const Align(child: EditableUserDisplayName()),
-          Align(
-            child: Consumer(
-                builder: (context, ref, child) => Container(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Align(
+                  child: InkWell(
+                      onTap: () => profileNotifier.uploadFile(),
+                      child: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        child: profileUrl.when(
+                            data: (url) => CustomUserAvatar(url: url),
+                            error: (error, stacktrace) =>
+                                Text(error.toString()),
+                            loading: () => const CircularProgressIndicator()),
+                      ))),
+              const Align(child: EditableUserDisplayName()),
+              Align(
+                child: Container(
                     margin: const EdgeInsets.all(20),
                     padding: const EdgeInsets.all(20),
                     child: Text(
-                      "${ref.read(userProvider).value!.email}",
+                      "${ref.read(userProvider).value?.email}",
                       style: const TextStyle(fontSize: 20),
-                    ))),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: FilledButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pop(context);
-                },
-                child: Container(
-                    margin: const EdgeInsets.all(10),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Icon(Icons.exit_to_app),
-                        ),
-                        Text("Logout"),
-                      ],
-                    ))),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: FilledButton(
-                onPressed: () {
-                  FirebaseAuth.instance.currentUser!.delete();
-                  Navigator.pop(context);
-                },
-                style: ButtonStyle(backgroundColor: CustomRedColor()),
-                child: const Text("Delete Account")),
+                    )),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: FilledButton(
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                        margin: const EdgeInsets.all(10),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Icon(Icons.exit_to_app),
+                            ),
+                            Text("Logout"),
+                          ],
+                        ))),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: FilledButton(
+                    onPressed: () {
+                      FirebaseAuth.instance.currentUser!.delete();
+                      Navigator.pop(context);
+                    },
+                    style: ButtonStyle(backgroundColor: CustomRedColor()),
+                    child: const Text("Delete Account")),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Change to $text"),
+                  Switch.adaptive(
+                      value: currentValue,
+                      onChanged: (value) {
+                        currentValue = value;
+                        brightnessNotifier.changeBrightness(value);
+                      }),
+                ],
+              )
+            ],
           ),
         ],
       ),
