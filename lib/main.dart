@@ -20,7 +20,6 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Material(
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
         home: const AuthGate(),
         title: "Todo",
         theme: ThemeData.from(
