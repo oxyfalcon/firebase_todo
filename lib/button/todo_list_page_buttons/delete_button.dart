@@ -1,8 +1,9 @@
 import 'package:app/Provider/future_provider.dart';
 import 'package:app/Provider/todo_schema.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DeleteButton extends StatelessWidget {
+class DeleteButton extends ConsumerWidget {
   const DeleteButton({
     super.key,
     required this.todoState,
@@ -13,11 +14,11 @@ class DeleteButton extends StatelessWidget {
   final Todo itr;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return IconButton.filled(
       color: Theme.of(context).cardColor,
       onPressed: () {
-        todoState.deleteTodo(itr);
+        ref.read(futureTodoListProvider.notifier).deleteTodo(itr);
       },
       icon: const Icon(Icons.delete),
     );

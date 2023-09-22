@@ -1,23 +1,24 @@
 import 'package:app/Provider/future_provider.dart';
 import 'package:app/Provider/todo_schema.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DoneDeleteButton extends StatelessWidget {
+class DoneDeleteButton extends ConsumerWidget {
   const DoneDeleteButton({
     super.key,
-    required this.todoState,
-    required this.itr,
+    required this.todo,
   });
 
-  final FutureTodoListNotifier todoState;
-  final Todo itr;
+  final Todo todo;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return IconButton.filled(
       color: Theme.of(context).cardColor,
       onPressed: () {
-        todoState.markedChange(itr: itr, change: false);
+        ref
+            .read(futureTodoListProvider.notifier)
+            .markedDelete(itr: todo);
       },
       icon: const Icon(Icons.delete),
     );

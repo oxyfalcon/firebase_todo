@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 final userProvider = AutoDisposeStreamProvider<User?>(
     (ref) => FirebaseAuth.instance.authStateChanges());
@@ -49,29 +48,32 @@ final profileUrlProvider =
 class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
   var db = FirebaseFirestore.instance;
   User? user;
+  late List<Todo> list;
+  late ItemsNotifier _itemsNotifier;
 
   @override
   Future<List<Todo>> build() async {
     print("FutureTodo builder --------------------");
     user = await ref.watch(userProvider.selectAsync((data) => data));
     db.settings = const Settings(persistenceEnabled: true);
-    return _fetchTodoFirebase();
+    list = await _fetchTodoFirebase();
+    return list;
   }
 
   Future<List<Todo>> _fetchTodoFirebase() async {
     var x = await db.collection(user!.uid).get();
-    List<Todo> list = [];
-    x.docs.map((e) => list.add(Todo.fromJson(e.data()))).toList();
-    return list;
+    List<Todo> temp = [];
+    x.docs.map((e) => temp.add(Todo.fromJson(e.data()))).toList();
+    _itemsNotifier = ref.watch(itemsProvider(temp).notifier);
+    return temp;
   }
 
-  Future<void> fetch() async => state = await AsyncValue.guard(() {
-        return _fetchTodoFirebase();
-      });
+  Future<void> fetch() async =>
+      state = await AsyncValue.guard(() => _fetchTodoFirebase());
 
-  void addTodo(Todo t) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+  Future<void> addTodo(Todo t) async {
+    ref.watch(itemsProvider(list).notifier).addTodo(t);
+    await AsyncValue.guard(() async {
       var id = db.collection('users').doc().id;
       var body = {
         "title": t.todo,
@@ -81,22 +83,18 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
       };
       t.id = id;
       db.collection(user!.uid).doc(t.id).set(body);
-      return _fetchTodoFirebase();
+      _fetchTodoFirebase();
     });
   }
 
   Future<void> deleteTodo(Todo t) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      String id = t.id;
-      db.collection(user!.uid).doc(id).delete();
-      return _fetchTodoFirebase();
-    });
+    _itemsNotifier.deleteTodo(t);
+    await db.collection(user!.uid).doc(t.id).delete();
   }
 
   Future<void> editTodo(Todo edited) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    _itemsNotifier.edit(edited);
+    await AsyncValue.guard(() async {
       Map<String, dynamic> body = {
         "title": edited.todo,
         "description": edited.description,
@@ -104,19 +102,17 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
         "_id": edited.id
       };
       db.collection(user!.uid).doc(edited.id).set(body);
-      return _fetchTodoFirebase();
     });
   }
 
   Future<void> markedChange({required Todo itr, required bool change}) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await db
-          .collection(user!.uid)
-          .doc(itr.id)
-          .update({'is_completed': change});
-      return _fetchTodoFirebase();
-    });
+    _itemsNotifier.markedChange(itr: itr, change: change);
+    await db.collection(user!.uid).doc(itr.id).update({'is_completed': change});
+  }
+
+  Future<void> markedDelete({required Todo itr}) async {
+    _itemsNotifier.markedDelete(itr: itr);
+    await db.collection(user!.uid).doc(itr.id).update({'is_completed': false});
   }
 }
 
@@ -124,27 +120,49 @@ final futureTodoListProvider =
     AutoDisposeAsyncNotifierProvider<FutureTodoListNotifier, List<Todo>>(
         () => FutureTodoListNotifier());
 
+class ItemsNotifier extends AutoDisposeFamilyNotifier<List<Todo>, List<Todo>> {
+  @override
+  List<Todo> build(List<Todo> arg) {
+    // _buildHelper();
+    return arg;
+  }
+
+  void markedChange({required Todo itr, required bool change}) {
+    for (var i in state) {
+      if (i.id == itr.id) {
+        i.isCompleted = change;
+      }
+    }
+  }
+
+  void markedDelete({required Todo itr}) {
+    state = List<Todo>.from(state.where((element) {
+      if (element.id == itr.id) {
+        element.isCompleted = false;
+      }
+      return true;
+    }));
+  }
+
+  void addTodo(Todo t) => state = [...state, t];
+
+  void deleteTodo(Todo t) {
+    state = List<Todo>.from(
+        state.where((element) => (element.id == t.id) ? false : true));
+  }
+
+  void edit(Todo edited) {
+    state = List<Todo>.from(state.where((element) {
+      if (element.id == edited.id) {
+        element = edited;
+      }
+      return true;
+    }));
+  }
+}
+
 class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
     with WidgetsBindingObserver {
-  // Brightness currentBrightness =
-  //      SchedulerBinding.instance.platformDispatcher.platformBrightness;
-  // late bool isDarkMode;
-
-  // void setMemory(bool value) async {
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   pref.setBool(DarkMode.isDark.name, value);
-  // }
-
-  // Future<bool> getMemory() async {
-  //   SharedPreferences pref = await SharedPreferences.getInstance();
-  //   return (pref.containsKey(DarkMode.isDark.name))
-  //       ? false
-  //       : pref.getBool(DarkMode.isDark.name) ??
-  //               (currentBrightness == Brightness.dark)
-  //           ? true
-  //           : false;
-  // }
-
   @override
   void didChangePlatformBrightness() {
     state = SchedulerBinding.instance.platformDispatcher.platformBrightness;
@@ -154,18 +172,17 @@ class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
   @override
   Brightness build() {
     WidgetsBinding.instance.addObserver(this);
-    // isDarkMode = await getMemory();
     return SchedulerBinding.instance.platformDispatcher.platformBrightness;
   }
 
-  void changeBrightness(bool value) {
-    state = (value) ? Brightness.dark : Brightness.light;
-    // setMemory(value);
-  }
+  void changeBrightness(bool value) =>
+      state = (value) ? Brightness.dark : Brightness.light;
 }
 
 final brightnessProvider =
     AutoDisposeNotifierProvider<BrightnessNotifier, Brightness>(
         () => BrightnessNotifier());
 
-enum DarkMode { isDark, isDefault }
+final itemsProvider =
+    AutoDisposeNotifierProviderFamily<ItemsNotifier, List<Todo>, List<Todo>>(
+        ItemsNotifier.new);

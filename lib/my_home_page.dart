@@ -1,9 +1,6 @@
 import 'package:app/Provider/future_provider.dart';
-import 'package:app/Provider/todo_schema.dart';
 import 'package:app/profile.dart';
-import 'package:app/screens/done_list_screen/marked_no_to_do_list.dart';
 import 'package:app/screens/done_list_screen/marked_todo_list.dart';
-import 'package:app/screens/todo_list_screen/no_to_list.dart';
 import 'package:app/screens/todo_list_screen/todo_list_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +59,7 @@ class _MyHomePageState extends State<MyHomePage>
                   var profileUrl = ref.watch(profileUrlProvider);
                   return profileUrl.when(
                       data: (url) => CustomUserAvatar(url: url),
-                      error: (error, stacktrace) =>
-                          Text(error.toString()),
+                      error: (error, stacktrace) => Text(error.toString()),
                       loading: () => const CircularProgressIndicator());
                 })),
           ],
@@ -95,43 +91,9 @@ class _MyHomePageState extends State<MyHomePage>
           title: const Text("Todo"),
           centerTitle: true,
           backgroundColor: Theme.of(context).colorScheme.inversePrimary),
-      body: TabBarView(controller: _tabController, children: [
-        Consumer(
-            builder: (_, ref, __) => ref.watch(futureTodoListProvider).when(
-                  data: (watchingList) {
-                    if (watchingList.isEmpty) {
-                      return const NoToDoList();
-                    } else {
-                      return TileDisplay(
-                        list: watchingList,
-                      );
-                    }
-                  },
-                  error: (error, stackTrace) {
-                    return Text(error.toString());
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                )),
-        Consumer(
-            builder: (_, ref, __) => ref.watch(futureTodoListProvider).when(
-                  data: (list) {
-                    bool flag =
-                        list.any((element) => (element.isCompleted == true));
-                    if (flag) {
-                      List<Todo> completedList = List.from(list.where(
-                          (element) =>
-                              (element.isCompleted == true) ? true : false));
-                      return MarkedTiles(completedList: completedList);
-                    } else {
-                      return const MarkedNoTodoList();
-                    }
-                  },
-                  error: (error, stackTrace) => Text(error.toString()),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                )),
-      ]),
+      body: TabBarView(
+          controller: _tabController,
+          children: const <Widget>[TileDisplay(), MarkedTiles()]),
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
     );
   }
