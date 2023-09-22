@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:589767727505:android:42cda83ff37447dddd6230",
+        "mobilesdk_app_id": "1:589767727505:android:5458817110f15ce6dd6230",
         "android_client_info": {
-          "package_name": "com.example.task_app"
+          "package_name": "com.oxyfalcon.taskApp"
         }
       },
       "oauth_client": [

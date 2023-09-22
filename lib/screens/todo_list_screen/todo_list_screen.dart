@@ -46,8 +46,8 @@ class TileDisplay extends ConsumerWidget {
                                   Text(stacktrace.toString())
                                 ],
                               ),
-                          loading: () =>
-                              const Center(child: CircularProgressIndicator()));
+                          loading: () => const Center(
+                              child: CircularProgressIndicator.adaptive()));
                     },
                   ),
                   Container(

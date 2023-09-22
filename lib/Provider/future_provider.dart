@@ -82,8 +82,7 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
         "_id": id
       };
       t.id = id;
-      db.collection(user!.uid).doc(t.id).set(body);
-      _fetchTodoFirebase();
+      await db.collection(user!.uid).doc(t.id).set(body);
     });
   }
 
@@ -101,7 +100,7 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
         "is_completed": edited.isCompleted,
         "_id": edited.id
       };
-      db.collection(user!.uid).doc(edited.id).set(body);
+      await db.collection(user!.uid).doc(edited.id).set(body);
     });
   }
 
@@ -122,10 +121,7 @@ final futureTodoListProvider =
 
 class ItemsNotifier extends AutoDisposeFamilyNotifier<List<Todo>, List<Todo>> {
   @override
-  List<Todo> build(List<Todo> arg) {
-    // _buildHelper();
-    return arg;
-  }
+  List<Todo> build(List<Todo> arg) => arg;
 
   void markedChange({required Todo itr, required bool change}) {
     for (var i in state) {

@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,18 +49,9 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBCfF9pFSls2Sh0Z5OJ8BkjDUymytMM5WI',
-    appId: '1:589767727505:web:3fbb5b139fb93b04dd6230',
-    messagingSenderId: '589767727505',
-    projectId: 'todo-list-ec223',
-    authDomain: 'todo-list-ec223.firebaseapp.com',
-    storageBucket: 'todo-list-ec223.appspot.com',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAY_-9r5pHnA3VpXJFnr__Yqd4BoSzto2M',
-    appId: '1:589767727505:android:42cda83ff37447dddd6230',
+    appId: '1:589767727505:android:5458817110f15ce6dd6230',
     messagingSenderId: '589767727505',
     projectId: 'todo-list-ec223',
     storageBucket: 'todo-list-ec223.appspot.com',
@@ -62,21 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAfIz9zxmOleQIa9AJ3rLrXHv93e5Vh8xw',
-    appId: '1:589767727505:ios:d44e7e444cb387bfdd6230',
+    appId: '1:589767727505:ios:f5a501353fa65acadd6230',
     messagingSenderId: '589767727505',
     projectId: 'todo-list-ec223',
     storageBucket: 'todo-list-ec223.appspot.com',
-    iosClientId: '589767727505-b2r87c11l2anvjp3ondgbnuej660s9tc.apps.googleusercontent.com',
-    iosBundleId: 'com.example.taskApp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAfIz9zxmOleQIa9AJ3rLrXHv93e5Vh8xw',
-    appId: '1:589767727505:ios:1318af7ff5ba265ddd6230',
-    messagingSenderId: '589767727505',
-    projectId: 'todo-list-ec223',
-    storageBucket: 'todo-list-ec223.appspot.com',
-    iosClientId: '589767727505-1k372aek9b29tb9iskql4nk5vjg2tn69.apps.googleusercontent.com',
-    iosBundleId: 'com.example.taskApp.RunnerTests',
+    iosBundleId: 'com.oxyfalcon.taskApp',
   );
 }

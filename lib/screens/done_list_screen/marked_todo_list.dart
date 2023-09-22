@@ -35,7 +35,9 @@ class _MarkedTilesState extends State<MarkedTiles> {
                             (element.isCompleted == true) ? true : false));
                         return MarkedList(completedList: completedList);
                       } else {
-                        return const MarkedNoTodoList();
+                        return const CustomScrollView(slivers: [
+                          SliverFillRemaining(child: MarkedNoTodoList())
+                        ]);
                       }
                     },
                     error: (error, stacktrace) => Column(
@@ -44,8 +46,8 @@ class _MarkedTilesState extends State<MarkedTiles> {
                             Text(stacktrace.toString())
                           ],
                         ),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()));
+                    loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive()));
               }),
             );
           }),
