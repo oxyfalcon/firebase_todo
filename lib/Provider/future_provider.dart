@@ -9,21 +9,17 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-final userProvider = AutoDisposeStreamProvider<User?>(
-    (ref) => FirebaseAuth.instance.authStateChanges());
-
 class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
+  User? user;
   @override
   Future<String> build() async {
-    print("profile builder --------------------");
-    String? temp =
-        await ref.watch(userProvider.selectAsync((data) => data?.photoURL));
+    user = FirebaseAuth.instance.currentUser;
+    String? temp = user?.photoURL;
     String authPhotoUrl = (temp == null) ? "" : temp;
     return authPhotoUrl;
   }
 
   Future<void> uploadFile() async {
-    User? user = ref.read(userProvider).value;
     ImagePicker pickImage = ImagePicker();
     final result2 = await pickImage.pickImage(source: ImageSource.gallery);
     if (result2 != null) {
@@ -34,7 +30,7 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
       state = await AsyncValue.guard(() async {
         await storage.putFile(file);
         String storageUrl = await storage.getDownloadURL();
-        user.updatePhotoURL(storageUrl);
+        user?.updatePhotoURL(storageUrl);
         return storageUrl;
       });
     }
@@ -53,8 +49,7 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
 
   @override
   Future<List<Todo>> build() async {
-    print("FutureTodo builder --------------------");
-    user = await ref.watch(userProvider.selectAsync((data) => data));
+    user = FirebaseAuth.instance.currentUser;
     db.settings = const Settings(persistenceEnabled: true);
     list = await _fetchTodoFirebase();
     return list;

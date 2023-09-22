@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage>
             StreamBuilder(
                 stream: FirebaseAuth.instance.userChanges(),
                 builder: (context, snapshot) =>
-                    Text(snapshot.data?.displayName ?? "Hello")),
+                    Text(snapshot.data?.displayName ?? "")),
             InkWell(
                 onTap: () => Navigator.push(
                     context,
@@ -60,7 +60,8 @@ class _MyHomePageState extends State<MyHomePage>
                   return profileUrl.when(
                       data: (url) => CustomUserAvatar(url: url),
                       error: (error, stacktrace) => Text(error.toString()),
-                      loading: () => const CircularProgressIndicator());
+                      loading: () =>
+                          const CircularProgressIndicator.adaptive());
                 })),
           ],
           bottom: TabBar(

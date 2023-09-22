@@ -2,6 +2,7 @@ import 'package:app/Provider/future_provider.dart';
 import 'package:app/auth_gate.dart';
 import 'package:app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseUIAuth.configureProviders([EmailAuthProvider()]);
   return runApp(const ProviderScope(child: MyApp()));
 }
 

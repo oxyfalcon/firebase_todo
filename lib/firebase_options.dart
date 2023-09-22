@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAfIz9zxmOleQIa9AJ3rLrXHv93e5Vh8xw',
-    appId: '1:589767727505:ios:f5a501353fa65acadd6230',
+    appId: '1:589767727505:ios:d397dedf7ce6d00add6230',
     messagingSenderId: '589767727505',
     projectId: 'todo-list-ec223',
     storageBucket: 'todo-list-ec223.appspot.com',
-    iosBundleId: 'com.oxyfalcon.taskApp',
+    iosBundleId: 'com.oxyfalcon.apiTaskApp',
   );
 }

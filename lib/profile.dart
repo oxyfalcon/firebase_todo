@@ -1,8 +1,8 @@
 import 'package:app/Provider/future_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 
 class ProfilePage extends ConsumerWidget {
@@ -47,8 +47,8 @@ class ProfilePage extends ConsumerWidget {
                     margin: const EdgeInsets.all(20),
                     padding: const EdgeInsets.all(20),
                     child: Text(
-                      "${ref.read(userProvider).value?.email}",
-                      style: const TextStyle(fontSize: 20),
+                      "${FirebaseAuth.instance.currentUser?.email}",
+                      style: Theme.of(context).textTheme.bodyMedium,
                     )),
               ),
               Container(

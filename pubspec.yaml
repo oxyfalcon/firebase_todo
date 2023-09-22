@@ -41,11 +41,13 @@ dependencies:
   cloud_firestore: ^4.9.0
   firebase_core: ^2.15.1
   firebase_auth: ^4.9.0
-  flutterfire_ui: ^0.4.3+20
+  # flutterfire_ui: ^0.4.3+20
   firebase_storage: ^11.2.6
   provider: ^6.0.5
   image_picker: ^1.0.4
   change_app_package_name: ^1.1.0
+  firebase_ui_auth: ^1.8.0
+  firebase_ui_oauth: ^1.4.11
 
 
 dev_dependencies:
@@ -87,6 +89,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: SocialIcons
+      fonts:
+        - asset: packages/firebase_ui_auth/fonts/SocialIcons.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

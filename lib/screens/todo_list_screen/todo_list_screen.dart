@@ -12,20 +12,18 @@ class TileDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("tile build----------------------");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: RefreshIndicator.adaptive(
-            onRefresh: () => ref.watch(futureTodoListProvider.notifier).fetch(),
+            onRefresh: () => ref.read(futureTodoListProvider.notifier).fetch(),
             child: Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: Stack(
                 children: [
                   Consumer(
                     builder: (context, ref, child) {
-                      print("ListView Build");
                       final futureValue = ref.watch(futureTodoListProvider);
                       return futureValue.when(
                           data: (data) {

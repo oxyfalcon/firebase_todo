@@ -19,7 +19,7 @@ class _MarkedTilesState extends State<MarkedTiles> {
       children: [
         Expanded(
           child: Consumer(builder: (context, ref, child) {
-            return RefreshIndicator(
+            return RefreshIndicator.adaptive(
               onRefresh: () =>
                   ref.read(futureTodoListProvider.notifier).fetch(),
               child: Consumer(builder: (context, ref, child) {
