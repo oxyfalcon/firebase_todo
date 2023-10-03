@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage>
           ],
           bottom: TabBar(
               labelPadding: EdgeInsets.zero,
-              indicatorSize: TabBarIndicatorSize.tab,
+              // indicatorSize: TabBarIndicatorSize.label,
               labelColor: Colors.white,
               indicator: const UnderlineTabIndicator(),
               controller: _tabController,
@@ -135,11 +135,8 @@ class CustomTabs extends StatelessWidget {
           return Tab(child: LayoutBuilder(builder: (context, constraints) {
             return Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: color,
-              ),
-              width: constraints.biggest.width,
-              height: constraints.maxHeight,
+                  borderRadius: BorderRadius.circular(10), color: color),
+              padding: const EdgeInsets.all(10),
               child: icon,
             );
           }));
