@@ -10,13 +10,13 @@ class AddButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        onPressed: (() {
-          openDialog(
-              context: context,
-              futureTodoListNotifier: ref.read(futureTodoListProvider.notifier),
-              todo: Todo.empty(),
-              edit: false);
-        }),
+      onPressed: (() {
+        openDialog(
+            context: context,
+            futureTodoListNotifier: ref.read(futureTodoListProvider.notifier),
+            todo: Todo.empty(),
+            edit: false);
+      }),
       child: const Icon(Icons.add),
     );
   }

@@ -60,6 +60,7 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
     List<Todo> temp = [];
     x.docs.map((e) => temp.add(Todo.fromJson(e.data()))).toList();
     _itemsNotifier = ref.watch(itemsProvider(temp).notifier);
+    list = temp;
     return temp;
   }
 
@@ -125,6 +126,9 @@ class ItemsNotifier extends AutoDisposeFamilyNotifier<List<Todo>, List<Todo>> {
       }
     }
   }
+
+  void changeList({required List<Todo> newList}) =>
+      state = List<Todo>.from(newList);
 
   void markedDelete({required Todo itr}) {
     state = List<Todo>.from(state.where((element) {
