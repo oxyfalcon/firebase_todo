@@ -47,6 +47,11 @@ dependencies:
   change_app_package_name: ^1.1.0
   firebase_ui_auth: ^1.8.0
   firebase_ui_oauth: ^1.4.11
+  shared_preferences: ^2.2.2
+  cached_network_image: ^3.3.0
+  flutter_cache_manager: ^3.3.1
+  path_provider: ^2.1.1
+  http: ^1.1.0
 
 
 dev_dependencies:

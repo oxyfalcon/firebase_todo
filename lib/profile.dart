@@ -1,7 +1,9 @@
 import 'package:app/Provider/future_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 
@@ -122,14 +124,23 @@ class CustomUserAvatar extends ConsumerWidget {
         clipper: const ShapeBorderClipper(shape: CircleBorder()),
         clipBehavior: Clip.hardEdge,
         child: url != ""
-            ? Image.network(
-                url,
-                width: size,
-                height: size,
-                cacheWidth: size.toInt(),
-                cacheHeight: size.toInt(),
-                fit: BoxFit.cover,
-              )
+            ? FutureBuilder(
+                future: ref
+                    .watch(profileUrlProvider.notifier)
+                    .cacheLastUpdate(false, url),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return CachedNetworkImage(
+                      cacheManager: CustomCacheManager.instance,
+                      imageUrl: url,
+                      width: size,
+                      height: size,
+                      fit: BoxFit.cover,
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                })
             : Center(
                 child: Icon(
                   Icons.account_circle,
@@ -140,4 +151,13 @@ class CustomUserAvatar extends ConsumerWidget {
       ),
     );
   }
+}
+
+class CustomCacheManager {
+  static String key = 'cache2';
+  static CacheManager instance = CacheManager(Config(
+    key,
+    stalePeriod: const Duration(days: 7),
+    maxNrOfCacheObjects: 20,
+  ));
 }

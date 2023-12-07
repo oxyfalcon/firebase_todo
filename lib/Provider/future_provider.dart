@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:app/Provider/todo_schema.dart';
+import 'package:app/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
   User? user;
+
   @override
   Future<String> build() async {
     user = FirebaseAuth.instance.currentUser;
@@ -33,6 +35,15 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
         user?.updatePhotoURL(storageUrl);
         return storageUrl;
       });
+    }
+  }
+
+  Future<void> cacheLastUpdate(bool cache, String url) async {
+    var value = await http.get(Uri.parse(url));
+
+    print(value.headers);
+    if(!cache){
+      return await CustomCacheManager.instance.emptyCache();
     }
   }
 }
@@ -130,44 +141,39 @@ class ItemsNotifier extends AutoDisposeFamilyNotifier<List<Todo>, List<Todo>> {
   void changeList({required List<Todo> newList}) =>
       state = List<Todo>.from(newList);
 
-  void markedDelete({required Todo itr}) {
-    state = List<Todo>.from(state.where((element) {
-      if (element.id == itr.id) {
-        element.isCompleted = false;
-      }
-      return true;
-    }));
-  }
+  void markedDelete({required Todo itr}) =>
+      state = List<Todo>.from(state.where((element) {
+        if (element.id == itr.id) {
+          element.isCompleted = false;
+        }
+        return true;
+      }));
 
   void addTodo(Todo t) => state = [...state, t];
 
-  void deleteTodo(Todo t) {
-    state = List<Todo>.from(
-        state.where((element) => (element.id == t.id) ? false : true));
-  }
+  void deleteTodo(Todo t) => state = List<Todo>.from(
+      state.where((element) => (element.id == t.id) ? false : true));
 
-  void edit(Todo edited) {
-    state = List<Todo>.from(state.where((element) {
-      if (element.id == edited.id) {
-        element = edited;
-      }
-      return true;
-    }));
-  }
+  void edit(Todo edited) => state = List<Todo>.from(state.where((element) {
+        if (element.id == edited.id) {
+          element = edited;
+        }
+        return true;
+      }));
 }
 
 class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
     with WidgetsBindingObserver {
   @override
   void didChangePlatformBrightness() {
-    state = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    state = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     super.didChangePlatformBrightness();
   }
 
   @override
   Brightness build() {
     WidgetsBinding.instance.addObserver(this);
-    return SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    return WidgetsBinding.instance.platformDispatcher.platformBrightness;
   }
 
   void changeBrightness(bool value) =>

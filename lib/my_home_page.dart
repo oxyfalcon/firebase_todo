@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage>
           ],
           bottom: TabBar(
               labelPadding: EdgeInsets.zero,
-              // indicatorSize: TabBarIndicatorSize.label,
+              indicatorSize: TabBarIndicatorSize.label,
               labelColor: Colors.white,
               indicator: const UnderlineTabIndicator(),
               controller: _tabController,
