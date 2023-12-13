@@ -5,52 +5,42 @@ import 'package:app/screens/done_list_screen/marked_no_to_do_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MarkedTiles extends StatefulWidget {
+class MarkedTiles extends ConsumerWidget {
   const MarkedTiles({super.key});
 
   @override
-  State<MarkedTiles> createState() => _MarkedTilesState();
-}
-
-class _MarkedTilesState extends State<MarkedTiles> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<List<Todo>> initValue = ref.watch(futureTodoListProvider);
+    final FutureTodoListNotifier futureNotifier =
+        ref.read(futureTodoListProvider.notifier);
     return Column(
       children: [
         Expanded(
-          child: Consumer(builder: (context, ref, child) {
-            return RefreshIndicator.adaptive(
-              onRefresh: () =>
-                  ref.read(futureTodoListProvider.notifier).fetch(),
-              child: Consumer(builder: (context, ref, child) {
-                final initValue = ref.watch(futureTodoListProvider);
-                return initValue.when(
-                    data: (data) {
-                      final list = ref.watch(itemsProvider(data));
-                      List<Todo> completedList = [];
-                      bool flag =
-                          list.any((element) => (element.isCompleted == true));
-                      if (flag) {
-                        completedList = List.from(list.where((element) =>
-                            (element.isCompleted == true) ? true : false));
-                        return MarkedList(completedList: completedList);
-                      } else {
-                        return const CustomScrollView(slivers: [
-                          SliverFillRemaining(child: MarkedNoTodoList())
-                        ]);
-                      }
-                    },
-                    error: (error, stacktrace) => Column(
-                          children: [
-                            Text(error.toString()),
-                            Text(stacktrace.toString())
-                          ],
-                        ),
-                    loading: () => const Center(
-                        child: CircularProgressIndicator.adaptive()));
-              }),
-            );
-          }),
+          child: RefreshIndicator.adaptive(
+            onRefresh: () => futureNotifier.fetch(),
+            child: initValue.when(
+              data: (data) {
+                final list = ref.watch(itemsProvider(data));
+                List<Todo> completedList = [];
+                bool flag =
+                    list.any((element) => (element.isCompleted == true));
+                if (flag) {
+                  completedList = List.from(list.where((element) =>
+                      (element.isCompleted == true) ? true : false));
+                  return MarkedList(completedList: completedList);
+                } else {
+                  return const CustomScrollView(slivers: [
+                    SliverFillRemaining(child: MarkedNoTodoList())
+                  ]);
+                }
+              },
+              error: (error, stacktrace) => Column(
+                children: [Text(error.toString()), Text(stacktrace.toString())],
+              ),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()),
+            ),
+          ),
         ),
       ],
     );

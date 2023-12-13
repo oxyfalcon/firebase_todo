@@ -8,7 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
   User? user;
@@ -39,10 +38,8 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<String> {
   }
 
   Future<void> cacheLastUpdate(bool cache, String url) async {
-    var value = await http.get(Uri.parse(url));
-
-    print(value.headers);
-    if(!cache){
+    if (!cache) {
+      PaintingBinding.instance.imageCache.clear();
       return await CustomCacheManager.instance.emptyCache();
     }
   }
