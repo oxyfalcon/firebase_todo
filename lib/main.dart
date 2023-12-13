@@ -26,16 +26,14 @@ class MyApp extends ConsumerWidget {
     return FutureBuilder(
         future: getApp(),
         builder: (context, snapshot) {
-          Widget initial;
           if (snapshot.hasError) {
-            initial = FirebaseApp(child: Text(snapshot.error.toString()));
+            return FirebaseApp(child: Text(snapshot.error.toString()));
           }
-          initial = (snapshot.connectionState == ConnectionState.done)
+          return (snapshot.connectionState == ConnectionState.done)
               ? const FirebaseApp(
                   child: AuthGate(),
                 )
               : const FirebaseApp(child: CircularProgressIndicator());
-          return initial;
         });
   }
 

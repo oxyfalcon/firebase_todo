@@ -117,38 +117,32 @@ class CustomUserAvatar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     double size = 100;
-    return SizedBox(
-      height: size,
-      width: size,
-      child: ClipPath(
-        clipper: const ShapeBorderClipper(shape: CircleBorder()),
-        clipBehavior: Clip.hardEdge,
-        child: url != ""
-            ? FutureBuilder(
-                future: ref
-                    .watch(profileUrlProvider.notifier)
-                    .cacheLastUpdate(false, url),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return CachedNetworkImage(
-                      cacheManager: CustomCacheManager.instance,
-                      imageUrl: url,
-                      width: size,
-                      height: size,
-                      fit: BoxFit.cover,
-                    );
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                })
-            : Center(
-                child: Icon(
-                  Icons.account_circle,
-                  size: size,
-                  color: Colors.grey,
-                ),
+    return ClipPath(
+      clipper: const ShapeBorderClipper(shape: CircleBorder()),
+      clipBehavior: Clip.hardEdge,
+      child: url != ""
+          ? FutureBuilder(
+              future: ref
+                  .watch(profileUrlProvider.notifier)
+                  .cacheLastUpdate(false, url),
+              builder: (context, snapshot) {
+                return CachedNetworkImage(
+                  placeholder: (context, str) =>
+                      const CircularProgressIndicator.adaptive(),
+                  cacheManager: CustomCacheManager.instance,
+                  imageUrl: url,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                );
+              })
+          : Center(
+              child: Icon(
+                Icons.account_circle,
+                size: size,
+                color: Colors.grey,
               ),
-      ),
+            ),
     );
   }
 }

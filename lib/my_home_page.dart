@@ -1,4 +1,5 @@
 import 'package:app/Provider/future_provider.dart';
+import 'package:app/button/main_buttons/add_button.dart';
 import 'package:app/profile.dart';
 import 'package:app/screens/done_list_screen/marked_todo_list.dart';
 import 'package:app/screens/todo_list_screen/todo_list_screen.dart';
@@ -44,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: const AddButton(),
       appBar: AppBar(
           actions: [
             StreamBuilder(

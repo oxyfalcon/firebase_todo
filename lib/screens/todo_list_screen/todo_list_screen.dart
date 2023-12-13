@@ -1,17 +1,23 @@
 import 'package:app/Provider/future_provider.dart';
 import 'package:app/Provider/todo_schema.dart';
-import 'package:app/button/main_buttons/add_button.dart';
 import 'package:app/button/todo_list_page_buttons/delete_button.dart';
 import 'package:app/button/todo_list_page_buttons/edit_button.dart';
 import 'package:app/screens/todo_list_screen/no_to_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TileDisplay extends ConsumerWidget {
+class TileDisplay extends ConsumerStatefulWidget {
   const TileDisplay({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TileDisplay> createState() => _TileDisplayState();
+}
+
+class _TileDisplayState extends ConsumerState<TileDisplay>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -35,7 +41,7 @@ class TileDisplay extends ConsumerWidget {
                                 ],
                               );
                             } else {
-                              return TodoDisplay(list: list);
+                              return SliverTodoList(list: list);
                             }
                           },
                           error: (error, stacktrace) => Column(
@@ -48,12 +54,6 @@ class TileDisplay extends ConsumerWidget {
                               child: CircularProgressIndicator.adaptive()));
                     },
                   ),
-                  Container(
-                    alignment: Alignment.bottomRight,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    margin: const EdgeInsets.all(20.0),
-                    child: const AddButton(),
-                  )
                 ],
               ),
             ),
@@ -62,6 +62,9 @@ class TileDisplay extends ConsumerWidget {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class CheckBoxWidget extends ConsumerStatefulWidget {
@@ -103,22 +106,27 @@ class _CheckBoxWidgetState extends ConsumerState<CheckBoxWidget> {
   }
 }
 
-class TodoDisplay extends StatelessWidget {
-  const TodoDisplay({super.key, required this.list});
+class SliverTodoList extends StatelessWidget {
+  const SliverTodoList({super.key, required this.list});
 
   final List<Todo> list;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: list.length,
-        itemBuilder: (context, itr) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Card(
-              child: CheckBoxWidget(todo: list[itr]),
-            ),
-          );
-        });
+    return CustomScrollView(
+      slivers: [
+        SliverList.builder(
+            itemCount: list.length,
+            itemBuilder: (context, index) => Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: Card(
+                    child: CheckBoxWidget(todo: list[index]),
+                  ),
+                )),
+        const SliverPadding(
+            padding: EdgeInsets.only(bottom: kMinInteractiveDimension))
+      ],
+    );
   }
 }
