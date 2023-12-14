@@ -16,9 +16,7 @@ class DoneDeleteButton extends ConsumerWidget {
     return IconButton.filled(
       color: Theme.of(context).cardColor,
       onPressed: () {
-        ref
-            .read(futureTodoListProvider.notifier)
-            .markedDelete(itr: todo);
+        ref.read(futureTodoListProvider.notifier).markedDelete(itr: todo);
       },
       icon: const Icon(Icons.delete),
     );
