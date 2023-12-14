@@ -76,7 +76,7 @@ class FutureTodoListNotifier extends AutoDisposeAsyncNotifier<List<Todo>> {
       state = await AsyncValue.guard(() => _fetchTodoFirebase());
 
   Future<void> addTodo(Todo t) async {
-    ref.watch(itemsProvider(list).notifier).addTodo(t);
+    _itemsNotifier.addTodo(t);
     await AsyncValue.guard(() async {
       var id = db.collection('users').doc().id;
       var body = {
