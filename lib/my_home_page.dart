@@ -51,7 +51,14 @@ class _MyHomePageState extends State<MyHomePage>
             StreamBuilder(
                 stream: FirebaseAuth.instance.userChanges(),
                 builder: (context, snapshot) =>
-                    Text(snapshot.data?.displayName ?? "")),
+                    Text(
+                      snapshot.data?.displayName != null
+                          ? (snapshot.data!.displayName.length > 3
+                          ? '${snapshot.data!.displayName.substring(0, 3)}...'
+                          : snapshot.data!.displayName)
+                          : '',
+                    ), // Here is the solution to your issue
+            ), // Linting issue was caused because of this missing closing parenthesis
             InkWell(
                 onTap: () => Navigator.push(
                     context,
