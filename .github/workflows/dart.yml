@@ -22,6 +22,12 @@ jobs:
 
     - name: Lint
       run: dart format --output=none --set-exit-if-changed .
+    
+    - name: dart anaylze
+      run: dart analyze
+    
+    - name: flutter analyze
+      run: flutter analyze
 
     - name: Pub Upgrade
       run: flutter pub upgrade
