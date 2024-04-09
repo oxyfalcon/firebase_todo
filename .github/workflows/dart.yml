@@ -19,6 +19,12 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
+    
+    - name: pub get
+      run: flutter pub get
+    
+    - name: pub upgrade
+      run: flutter pub upgrade --major-versions
 
     - name: Lint
       run: dart format --output=none --set-exit-if-changed .
@@ -28,9 +34,6 @@ jobs:
     
     - name: flutter analyze
       run: flutter analyze
-
-    - name: Pub Upgrade
-      run: flutter pub upgrade
 
     # - name: Run Unit Tests / Widget Tests
     #   run: flutter test
