@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:app/Provider/todo_schema.dart';
-import 'package:app/config.dart';
 import 'package:app/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -164,34 +163,18 @@ class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
     with WidgetsBindingObserver {
   @override
   void didChangePlatformBrightness() {
-    changeBrightness(
-        WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-            Brightness.dark);
+    state = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     super.didChangePlatformBrightness();
   }
 
   @override
   Brightness build() {
-    bool? isDark = Config().pref.getBool("isDark");
     WidgetsBinding.instance.addObserver(this);
-    if (isDark == null) {
-      Brightness brightness =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-      brightness == Brightness.dark
-          ? Config().pref.setBool("isDark", true)
-          : Config().pref.setBool("isDark", false);
-      return brightness;
-    } else {
-      return isDark ? Brightness.dark : Brightness.light;
-    }
+    return WidgetsBinding.instance.platformDispatcher.platformBrightness;
   }
 
-  Future<void> changeBrightness(bool value) async {
-    state = (value) ? Brightness.dark : Brightness.light;
-    state == Brightness.dark
-        ? await Config().pref.setBool("isDark", true)
-        : await Config().pref.setBool("isDark", false);
-  }
+  void changeBrightness(bool value) =>
+      state = (value) ? Brightness.dark : Brightness.light;
 }
 
 final brightnessProvider =

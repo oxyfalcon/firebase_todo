@@ -90,9 +90,9 @@ class ProfilePage extends ConsumerWidget {
                   Text("Change to $text"),
                   Switch.adaptive(
                       value: currentValue,
-                      onChanged: (value) async {
+                      onChanged: (value) {
                         currentValue = value;
-                        await brightnessNotifier.changeBrightness(value);
+                        brightnessNotifier.changeBrightness(value);
                       }),
                 ],
               )
