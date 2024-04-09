@@ -164,9 +164,10 @@ class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
     with WidgetsBindingObserver {
   @override
   void didChangePlatformBrightness() {
-    changeBrightness(
-        WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-            Brightness.dark);
+    WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark
+        ? setDark()
+        : setLight();
     super.didChangePlatformBrightness();
   }
 
@@ -186,11 +187,14 @@ class BrightnessNotifier extends AutoDisposeNotifier<Brightness>
     }
   }
 
-  Future<void> changeBrightness(bool value) async {
-    state = (value) ? Brightness.dark : Brightness.light;
-    state == Brightness.dark
-        ? await Config().pref.setBool("isDark", true)
-        : await Config().pref.setBool("isDark", false);
+  Future<void> setDark() async {
+    state = Brightness.dark;
+    await Config().pref.setBool("isDark", true);
+  }
+
+  Future<void> setLight() async {
+    state = Brightness.light;
+    await Config().pref.setBool("isDark", false);
   }
 }
 

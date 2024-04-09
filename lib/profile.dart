@@ -92,7 +92,9 @@ class ProfilePage extends ConsumerWidget {
                       value: currentValue,
                       onChanged: (value) async {
                         currentValue = value;
-                        await brightnessNotifier.changeBrightness(value);
+                        (value)
+                            ? brightnessNotifier.setDark()
+                            : brightnessNotifier.setLight();
                       }),
                 ],
               )
