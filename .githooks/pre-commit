@@ -1,0 +1,24 @@
+#!/bin/sh
+
+if ! output=$(dart analyze)
+then
+	echo "COMMIT REJECTED: dart analyze has the following errors"
+	echo "$output"
+	exit 1
+fi
+
+if ! output=$(flutter analyze)
+then
+	echo "COMMIT REJECTED: flutter analyze has the following errors"
+	echo "$output"
+	exit 1
+fi
+
+if ! output=$(dart format -o none --set-exit-if-changed .)
+then
+	echo "COMMIT REJECTED: dart format has the following errors"
+	echo "$output"
+	exit 1
+fi
+
+exit 0
