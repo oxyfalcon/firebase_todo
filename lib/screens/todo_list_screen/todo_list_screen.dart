@@ -106,22 +106,28 @@ class _CheckBoxWidgetState extends ConsumerState<CheckBoxWidget> {
   }
 }
 
-class SliverTodoList extends StatelessWidget {
+class SliverTodoList extends ConsumerWidget {
   const SliverTodoList({super.key, required this.list});
 
   final List<Todo> list;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return CustomScrollView(
       slivers: [
         SliverList.builder(
             itemCount: list.length,
-            itemBuilder: (context, index) => Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: Card(
-                    child: CheckBoxWidget(todo: list[index]),
+            itemBuilder: (context, index) => Dismissible(
+                  onDismissed: (direction) => ref
+                      .watch(futureTodoListProvider.notifier)
+                      .deleteTodo(list[index]),
+                  key: ValueKey(list[index]),
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Card(
+                      child: CheckBoxWidget(todo: list[index]),
+                    ),
                   ),
                 )),
         const SliverPadding(
